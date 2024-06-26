@@ -14,7 +14,6 @@
 #include "gpio_provider.dtsi"           /* k230 soc gpio provider */
 #include "gpio_consumer.dtsi"           /* k230 soc gpio consumer */
 
-
 / {
 	aliases {
 		serial0 = &uart0;
@@ -26,7 +25,20 @@
 		linux,initrd-end = <0x0 0x0>;
 		stdout-path = "serial0:115200";
 	};
+
+	hdmi: connector {
+		compatible = "hdmi-connector";
+		label = "hdmi";
+		type = "a";
+
+		port {
+			hdmi_connector_in: endpoint {
+				remote-endpoint = <&lt9611_out>;
+			};
+		};
+	};
 };
+
 &ddr {
 	reg = <0x0 0x200000 0x0 0x1fdff000>;  /*linux memory config*/
 };
@@ -50,14 +62,14 @@
 			#size-cells = <1>;
 
 			partition@0 {
-			/* spl boot */
-			reg = <0x0 0x00080000>;
-			label = "spl_boot";
+				/* spl boot */
+				reg = <0x0 0x00080000>;
+				label = "spl_boot";
 			};
 			partition@2000000 {
-			/* 32MB for  update image*/
-			reg = <0 0x2000000>;
-			label = "all_flash";
+				/* 32MB for  update image*/
+				reg = <0 0x2000000>;
+				label = "all_flash";
 			};
 		};
 	};
@@ -119,29 +131,56 @@
     mshc_ctrl_r = <0x00>;
 };
 
-&dsi {
-    status = "okay";
-
-    panel@0 {
-        compatible = "canaan,hx8399";
-        reg = <0>;
-
-        display-timings {
-            timing-0 {
-                clock-frequency = <74250000>;
-                hactive = <1920>;
-                vactive = <1080>;
-                hfront-porch = <88>;
-                hback-porch = <148>;
-                hsync-len = <44>;
-                vfront-porch = <36>;
-                vback-porch = <4>;
-                vsync-len = <5>;
-            };
-        };
-    };
-};
-
 &uart0 {
 	status = "okay";
+};
+
+&i2c3 {
+	status = "okay";
+};
+
+&i2c4 {
+	status = "okay";
+
+	lt9611: hdmi-bridge@3b {
+		compatible = "lontium,lt9611";
+		reg = <0x3b>;
+		reset-gpios = <&port10 0 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&gpio11>;
+		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
+		ports {
+			#address-cells  = <1>;
+			#size-cells     = <0>;
+			port@1 {
+				reg = <1>;
+				lt9611_in: endpoint {
+					remote-endpoint = <&dsi_out_lt9611>;
+				};
+			};
+
+			port@2 {
+				reg = <2>;
+				lt9611_out: endpoint {
+					remote-endpoint = <&hdmi_connector_in>;
+				};
+			};
+		};
+	};
+};
+
+&dsi {
+	status = "okay";
+
+	ports {
+		port@1 {
+			reg = <1>;
+			dsi_out_lt9611: endpoint {
+				remote-endpoint = <&lt9611_in>;
+			};
+		};
+	};
+};
+
+&vo {
+	vth_line = <10>;
 };
