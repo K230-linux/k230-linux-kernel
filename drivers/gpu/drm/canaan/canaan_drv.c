@@ -20,7 +20,7 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_of.h>
 #include <drm/drm_gem_dma_helper.h>
-#include <drm/drm_fbdev_ttm.h>
+#include <drm/drm_fbdev_dma.h>
 #include <drm/drm_vblank.h>
 #include <drm/drm_ioctl.h>
 #include <drm/drm_print.h>
@@ -251,7 +251,7 @@ static int canaan_drm_bind(struct device *dev)
 	ret = component_bind_all(dev, drm_dev);
 	if (ret) {
 		DRM_DEV_ERROR(dev, "Failed to bind all components\n");
-		goto cleanup_mode_config;
+		goto unbind_all;
 	}
 
 	ret = drm_vblank_init(drm_dev, drm_dev->mode_config.num_crtc);
@@ -269,7 +269,7 @@ static int canaan_drm_bind(struct device *dev)
 		goto finish_poll;
 	}
 
-	drm_fbdev_ttm_setup(drm_dev, 32);
+	drm_fbdev_dma_setup(drm_dev, 32);
 	DRM_DEV_INFO(dev, "Canaan K230 DRM driver register successfully\n");
 
 	return 0;
@@ -338,22 +338,28 @@ static int canaan_drm_platform_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct component_match *match = NULL;
+	int ret;
 
 	disp_dev = dev;
 	pm_runtime_enable(disp_dev);
 	match = canaan_drm_match_add(dev);
-	if (IS_ERR(match))
+	if (IS_ERR(match)) {
+		pm_runtime_disable(disp_dev);
 		return PTR_ERR(match);
+	}
 
-	return component_master_add_with_match(dev, &canaan_drm_master_ops,
+	ret = component_master_add_with_match(dev, &canaan_drm_master_ops,
 					       match);
+	if (ret)
+		pm_runtime_disable(disp_dev);
+
+	return ret;
 }
 
 static void canaan_drm_platform_remove(struct platform_device *pdev)
 {
 	component_master_del(&pdev->dev, &canaan_drm_master_ops);
-
-	return ;
+	pm_runtime_disable(&pdev->dev);
 }
 
 static const struct of_device_id canaan_drm_of_table[] = {

@@ -538,8 +538,10 @@ static int canaan_dsi_bind(struct device *dev, struct device *master,
 	dsi->drm = drm;
 
 	ret = drm_of_find_panel_or_bridge(dsi->dev->of_node, 1, -1, &dsi->panel, &dsi->bridge);
-	if (!dsi->panel && !dsi->bridge)
+	if (!dsi->panel && !dsi->bridge) {
+		drm_encoder_cleanup(&dsi->encoder);
 		return ret;
+	}
 
 	if (dsi->panel) {
 		drm_connector_helper_add(&dsi->connector,
