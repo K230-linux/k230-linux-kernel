@@ -452,21 +452,22 @@ static void canaan_vo_set_timing(struct canaan_vo *vo,
 	vfp = mode->vtotal - vsa - vbp - vact;
 	vtotal = mode->vtotal;
 
-	// 0 - 12 start ; 16 - 28 end
-	reg = (0x5 << 16) + 0x2;
+	// HSYNC/VSYNC timing: bits [12:0] = start, bits [28:16] = end
+	// HSYNC pulse: start=0, end=hsa-1
+	reg = ((hsa - 1) << 16) + 0;
 	canaan_vo_write(vo, VO_DISP_HSYNC_CTL, reg);
-
-	reg = (0x5 << 16) + 0x2;
 	canaan_vo_write(vo, VO_DISP_HSYNC1_CTL, reg);
-
-	reg = (0x5 << 16) + 0x2;
 	canaan_vo_write(vo, VO_DISP_HSYNC2_CTL, reg);
 
-	reg = (0x0 << 16) + 0x0;
+	// VSYNC pulse: start=0, end=vsa-1
+	reg = ((vsa - 1) << 16) + 0;
 	canaan_vo_write(vo, VO_DISP_VSYNC1_CTL, reg);
-
-	reg = (0x0 << 16) + 0x0;
 	canaan_vo_write(vo, VO_DISP_VSYNC2_CTL, reg);
+
+	pr_info("VO timing: htotal=%d, hsa=%d, hbp=%d, hact=%d\n",
+		htotal, hsa, hbp, hact);
+	pr_info("VO timing: vtotal=%d, vsa=%d, vbp=%d, vact=%d\n",
+		vtotal, vsa, vbp, vact);
 
 	reg = (hbp) + ((hact + hbp - 1) << 16);
 	canaan_vo_write(vo, VO_DISP_XZONE_CTL, reg);
@@ -499,6 +500,22 @@ void canaan_vo_enable_crtc(struct canaan_vo *vo,
 			0xffffff); // enalbe remap  0x77f8437
 	// enable vo
 	canaan_vo_write(vo, VO_REG_LOAD_CTL, 0x11);
+
+	dev_info(vo->dev, "VO timing registers after enable:\n");
+	dev_info(vo->dev, "  HSYNC_CTL=0x%08x, HSYNC1_CTL=0x%08x, HSYNC2_CTL=0x%08x\n",
+		 canaan_vo_read(vo, VO_DISP_HSYNC_CTL),
+		 canaan_vo_read(vo, VO_DISP_HSYNC1_CTL),
+		 canaan_vo_read(vo, VO_DISP_HSYNC2_CTL));
+	dev_info(vo->dev, "  VSYNC1_CTL=0x%08x, VSYNC2_CTL=0x%08x\n",
+		 canaan_vo_read(vo, VO_DISP_VSYNC1_CTL),
+		 canaan_vo_read(vo, VO_DISP_VSYNC2_CTL));
+	dev_info(vo->dev, "  DISP_CTL=0x%08x, DISP_ENABLE=0x%08x\n",
+		 canaan_vo_read(vo, VO_DISP_CTL),
+		 canaan_vo_read(vo, VO_DISP_ENABLE));
+	dev_info(vo->dev, "  TOTAL_SIZE=0x%08x, XZONE=0x%08x, YZONE=0x%08x\n",
+		 canaan_vo_read(vo, VO_DISP_TOTAL_SIZE),
+		 canaan_vo_read(vo, VO_DISP_XZONE_CTL),
+		 canaan_vo_read(vo, VO_DISP_YZONE_CTL));
 }
 
 void canaan_vo_disable_crtc(struct canaan_vo *vo,
