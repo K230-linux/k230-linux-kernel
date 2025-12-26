@@ -280,7 +280,8 @@ void canaan_dsi_lpdt_init(struct canaan_dsi *dsi, struct drm_display_mode *mode)
 	dsi_write(dsi, VID_MODE_CFG, 0xbf02);
 	dsi_write(dsi, CMD_MODE_CFG, 0x10f7f01);
 	dsi_write(dsi, PCKHDL_CFG, 0x1c);
-	dsi_write(dsi, 0x4, 0x1);
+	/* SDK sets PWR_UP here, while still in command mode */
+	dsi_write(dsi, 0x4, 0x1);  /* PWR_UP = 1 */
 }
 
 static void canaan_mipi_dsi_set_dsi_enable(struct canaan_dsi *dsi)
@@ -294,6 +295,7 @@ static void canaan_mipi_dsi_set_dsi_enable(struct canaan_dsi *dsi)
 	dsi_write(dsi, CMD_MODE_CFG, 0x0);
 	dsi_write(dsi, LPCLK_CTRL, 0x3);
 	dsi_write(dsi, LPCLK_CTRL, 0x1);
+	/* PWR_UP already set in lpdt_init, just need to switch modes */
 }
 
 static void canaan_mipi_dsi_set_test_mode(struct canaan_dsi *dsi)
