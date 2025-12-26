@@ -498,6 +498,11 @@ void canaan_vo_enable_crtc(struct canaan_vo *vo,
 	// set background
 	canaan_vo_write(vo, VO_DISP_BACKGROUND,
 			0xffffff); // enalbe remap  0x77f8437
+
+	// Enable display output - set bit 0 of DISP_CTL
+	canaan_vo_write(vo, VO_DISP_CTL,
+			canaan_vo_read(vo, VO_DISP_CTL) | 0x1);
+
 	// enable vo
 	canaan_vo_write(vo, VO_REG_LOAD_CTL, 0x11);
 
