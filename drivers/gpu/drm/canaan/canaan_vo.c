@@ -359,6 +359,30 @@ void canaan_vo_disable_vblank(struct canaan_vo *vo)
 	// canaan_vo_write(vo, VO_REG_LOAD_CTL, 0x11);
 }
 
+static void canaan_vo_software_reset(struct canaan_vo *vo)
+{
+	/* VO software reset using already-mapped VO registers */
+	canaan_vo_write(vo, 0x0, 0x0f);
+	canaan_vo_write(vo, 0x8, 0x00);
+	canaan_vo_write(vo, 0x4, 0x00);
+}
+
+static void canaan_vo_display_reset(struct canaan_vo *vo)
+{
+	/* Display subsystem reset - only if reset register was mapped successfully */
+	if (!vo->reset_base) {
+		dev_warn(vo->dev, "Display reset register not mapped, skipping reset\n");
+		return;
+	}
+
+	writel(0, vo->reset_base);
+	msleep(1);
+	writel(0xffffffff, vo->reset_base);
+	msleep(1);
+
+	canaan_vo_software_reset(vo);
+}
+
 static void canaan_vo_init(struct canaan_vo *vo)
 {
 	int i = 0;
@@ -493,6 +517,9 @@ void canaan_vo_enable_crtc(struct canaan_vo *vo,
 			   struct canaan_crtc *canaan_crtc,
 			   struct drm_display_mode *adjusted_mode)
 {
+	/* Perform display reset before initialization */
+	canaan_vo_display_reset(vo);
+
 	canaan_vo_init(vo);
 	// set timing
 	canaan_vo_set_timing(vo, adjusted_mode);
@@ -645,6 +672,12 @@ static int canaan_vo_bind(struct device *dev, struct device *master, void *data)
 	if (IS_ERR(vo->reg_base)) {
 		DRM_DEV_ERROR(dev, "Failed to map register resource\n");
 		return PTR_ERR(vo->reg_base);
+	}
+
+	/* Map display reset register (0x91101090) - not fatal if it fails */
+	vo->reset_base = devm_ioremap(dev, 0x91101090, 4);
+	if (!vo->reset_base) {
+		dev_warn(dev, "Failed to map display reset register, continuing without hardware reset\n");
 	}
 
 	of_property_read_u32(np, "background", &vo->background);

@@ -16,6 +16,7 @@ struct canaan_vo {
 	struct drm_device *drm_dev;
 
 	void __iomem *reg_base;
+	void __iomem *reset_base;
 	int irq;
 	atomic_t vsync_enabled;
 
