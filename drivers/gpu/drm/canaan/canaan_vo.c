@@ -474,7 +474,7 @@ static void canaan_vo_set_timing(struct canaan_vo *vo,
 
 	// set yzone
 	reg = 0;
-	reg = (vbp + 1) + (((vact + (vbp + 1)) - 1) << 16);
+	reg = (vbp) + (((vact + (vbp)) - 1) << 16);
 	canaan_vo_write(vo, VO_DISP_YZONE_CTL, reg);
 
 	// set total size
@@ -488,10 +488,39 @@ static void canaan_vo_set_timing(struct canaan_vo *vo,
 	canaan_vo_write(vo, 0x780, reg); // enalbe remap  0x77f8437
 }
 
+static int kd_vo_software_reset(void)
+{
+	void *vo_reg;
+	vo_reg = ioremap(0x90840000, 0x10000);
+
+	writel(0x0f, vo_reg + 0);
+	writel(0x00, vo_reg + 0x8);
+	writel(0x00, vo_reg + 0x4);
+
+	iounmap(vo_reg);
+	return 0;
+}
+
+static int k230_display_rst(void)
+{
+	void *rst;
+	rst = ioremap(0x91101090, 4);
+	writel(0, rst);
+	msleep(1);
+	writel(0xffffffff, rst);
+	iounmap(rst);
+
+	msleep(1);
+	kd_vo_software_reset();
+	return 0;
+}
+
 void canaan_vo_enable_crtc(struct canaan_vo *vo,
 			   struct canaan_crtc *canaan_crtc,
 			   struct drm_display_mode *adjusted_mode)
 {
+	k230_display_rst();
+
 	canaan_vo_init(vo);
 	// set timing
 	canaan_vo_set_timing(vo, adjusted_mode);
