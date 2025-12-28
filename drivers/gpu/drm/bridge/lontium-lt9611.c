@@ -30,6 +30,17 @@
 #define KEY_DDC_ACCS_DONE 0x02
 #define DDC_NO_ACK	0x50
 
+/*
+ * LT9611 MIPI port configuration (register 0x8300):
+ *   bits [7:6]: port select - 00=PortA, 01=PortB, 10/11=Dual
+ *   bits [1:0]: lane count  - 00=1lane, 01=2lanes, 10=3lanes, 11=4lanes
+ *
+ * Standard values:
+ *   Port A, 4 lanes: 0x03 (bits [7:6]=00, bits [1:0]=11)
+ *   Port B, 4 lanes: 0x43 (bits [7:6]=01, bits [1:0]=11)
+ *
+ * K230 CanMV boards use Port B with value 0x60 (non-standard, from SDK)
+ */
 #define LT9611_4LANES	0
 
 struct lt9611 {
@@ -92,16 +103,23 @@ static struct lt9611 *bridge_to_lt9611(struct drm_bridge *bridge)
 
 static int lt9611_mipi_input_analog(struct lt9611 *lt9611)
 {
+	/*
+	 * K230 SDK configuration - increased RX current for better signal integrity
+	 */
 	const struct reg_sequence reg_cfg[] = {
-		{ 0x8106, 0x40 }, /* port A rx current */
+		{ 0x8106, 0x60 }, /* port A rx current - increased from 0x40 */
+		{ 0x8107, 0x3f }, /* port A rx current */
+		{ 0x8108, 0x3f }, /* port A rx current */
 		{ 0x810a, 0xfe }, /* port A ldo voltage set */
 		{ 0x810b, 0xbf }, /* enable port A lprx */
-		{ 0x8111, 0x40 }, /* port B rx current */
+		{ 0x8111, 0x60 }, /* port B rx current - increased from 0x40 */
+		{ 0x8112, 0x3f }, /* port B rx current */
+		{ 0x8113, 0x3f }, /* port B rx current */
 		{ 0x8115, 0xfe }, /* port B ldo voltage set */
 		{ 0x8116, 0xbf }, /* enable port B lprx */
 
 		{ 0x811c, 0x03 }, /* PortA clk lane no-LP mode */
-		{ 0x8120, 0x03 }, /* PortB clk lane with-LP mode */
+		{ 0x8120, 0x03 }, /* PortB clk lane no-LP mode */
 	};
 
 	return regmap_multi_reg_write(lt9611->regmap, reg_cfg, ARRAY_SIZE(reg_cfg));
@@ -110,17 +128,24 @@ static int lt9611_mipi_input_analog(struct lt9611 *lt9611)
 static int lt9611_mipi_input_digital(struct lt9611 *lt9611,
 				     const struct drm_display_mode *mode)
 {
+	/*
+	 * K230 SDK configuration for CanMV-K230 board.
+	 * Key changes: lane polarity/swap registers 0x8303/0x8304/0x8307
+	 */
 	struct reg_sequence reg_cfg[] = {
-		{ 0x8300, LT9611_4LANES },
-		{ 0x830a, 0x00 },
+		{ 0x8250, 0x14 },       /* MIPI RX control */
+		{ 0x8300, 0x60 },       /* Port B, 4 lanes - K230 specific value */
+		{ 0x8303, 0x4f },       /* Lane polarity/swap configuration */
+		{ 0x8304, 0x00 },       /* Lane swap control */
+		{ 0x8307, 0x40 },       /* Lane control */
 		{ 0x824f, 0x80 },
-		{ 0x8250, 0x10 },
-		{ 0x8302, 0x0a },
-		{ 0x8306, 0x0a },
+		{ 0x8302, 0x08 },       /* HS-SETTLE Port A */
+		{ 0x8306, 0x08 },       /* HS-SETTLE Port B */
+		{ 0x830a, 0x00 },
 	};
 
-	if (lt9611->dsi1_node)
-		reg_cfg[1].def = 0x03;
+	if (mode->hdisplay == 3840)
+		reg_cfg[8].def = 0x03;
 
 	return regmap_multi_reg_write(lt9611->regmap, reg_cfg, ARRAY_SIZE(reg_cfg));
 }
