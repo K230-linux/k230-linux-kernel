@@ -559,8 +559,13 @@ static int canaan_dsi_bind(struct device *dev, struct device *master,
 		drm_connector_attach_encoder(&dsi->connector, &dsi->encoder);
 	}
 
-	if (dsi->bridge)
-		drm_bridge_attach(&dsi->encoder, dsi->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
+	if (dsi->bridge) {
+		ret = drm_bridge_attach(&dsi->encoder, dsi->bridge, NULL, 0);
+		if (ret) {
+			dev_err(dsi->dev, "Failed to attach bridge: %d\n", ret);
+			goto err_cleanup_connector;
+		}
+	}
 
 	return 0;
 
