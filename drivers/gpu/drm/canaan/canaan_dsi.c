@@ -22,6 +22,7 @@
 #include <linux/slab.h>
 
 #include <drm/drm_atomic_helper.h>
+#include <drm/drm_bridge_connector.h>
 #include <drm/drm_mipi_dsi.h>
 #include <drm/drm_panel.h>
 #include <drm/drm_print.h>
@@ -560,11 +561,23 @@ static int canaan_dsi_bind(struct device *dev, struct device *master,
 	}
 
 	if (dsi->bridge) {
-		ret = drm_bridge_attach(&dsi->encoder, dsi->bridge, NULL, 0);
+		struct drm_connector *connector;
+
+		ret = drm_bridge_attach(&dsi->encoder, dsi->bridge, NULL,
+					DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 		if (ret) {
 			dev_err(dsi->dev, "Failed to attach bridge: %d\n", ret);
 			goto err_cleanup_connector;
 		}
+
+		connector = drm_bridge_connector_init(dsi->drm, &dsi->encoder);
+		if (IS_ERR(connector)) {
+			ret = PTR_ERR(connector);
+			dev_err(dsi->dev, "Failed to create bridge connector: %d\n", ret);
+			goto err_cleanup_connector;
+		}
+
+		drm_connector_attach_encoder(connector, &dsi->encoder);
 	}
 
 	return 0;
