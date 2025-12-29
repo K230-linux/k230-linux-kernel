@@ -141,6 +141,8 @@ config DRM_LONTIUM_LT9611
 	select DRM_KMS_HELPER
 	select DRM_MIPI_DSI
 	select REGMAP_I2C
+	select DRM_DISPLAY_HELPER
+	select DRM_BRIDGE_CONNECTOR
 	help
 	  Driver for Lontium LT9611 DSI to HDMI bridge
 	  chip driver that converts dual DSI and I2S to
