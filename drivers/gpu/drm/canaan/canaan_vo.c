@@ -136,6 +136,8 @@ static void canaan_vo_update_video(struct canaan_vo *vo,
 	disp_en = readl(vo->reg_base + VO_DISP_ENABLE);
 	disp_en |= 1 << plane_enable_bit;
 	writel(disp_en, vo->reg_base + VO_DISP_ENABLE);
+	dev_info(vo->dev, "VIDEO plane enabled: DISP_ENABLE=0x%08x, bit=%d\n",
+		 disp_en, plane_enable_bit);
 
 	DRM_DEBUG_DRIVER("VIDEO_CTL_REG: 0x%02x\n",
 			 readl(vo->reg_base + plane_offset +
@@ -248,6 +250,8 @@ static void canaan_vo_update_osd(struct canaan_vo *vo,
 	disp_en = readl(vo->reg_base + VO_DISP_ENABLE);
 	disp_en |= 1 << plane_enable_bit;
 	writel(disp_en, vo->reg_base + VO_DISP_ENABLE);
+	dev_info(vo->dev, "OSD plane enabled: DISP_ENABLE=0x%08x, bit=%d\n",
+		 disp_en, plane_enable_bit);
 
 	DRM_DEBUG_DRIVER(
 		"OSD_INFO_REG: 0x%02x\n",
@@ -348,7 +352,7 @@ int canaan_vo_enable_vblank(struct canaan_vo *vo)
 	atomic_set(&vo->vsync_enabled, 1);
 
 	canaan_vo_set_vtth_intr(vo, 1, vo->vth_line);
-	// canaan_vo_write(vo, VO_REG_LOAD_CTL, 0x11);
+	canaan_vo_write(vo, VO_REG_LOAD_CTL, 0x11);
 	return 0;
 }
 
@@ -357,7 +361,7 @@ void canaan_vo_disable_vblank(struct canaan_vo *vo)
 	atomic_set(&vo->vsync_enabled, 0);
 
 	canaan_vo_set_vtth_intr(vo, 0, vo->vth_line);
-	// canaan_vo_write(vo, VO_REG_LOAD_CTL, 0x11);
+	canaan_vo_write(vo, VO_REG_LOAD_CTL, 0x11);
 }
 
 static void canaan_vo_software_reset(struct canaan_vo *vo)
