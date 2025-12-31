@@ -326,7 +326,9 @@ static void canaan_dsi_encoder_enable(struct drm_encoder *encoder)
 
 	DRM_DEBUG_DRIVER("Enabling DSI output\n");
 
-	dev_vdbg(dsi->dev, "DSI encoder enable %u\n", adjusted_mode->clock);
+	dev_info(dsi->dev, "DSI encoder enable: mode=%ux%u@%uHz, clock=%u\n",
+		 adjusted_mode->hdisplay, adjusted_mode->vdisplay,
+		 drm_mode_vrefresh(adjusted_mode), adjusted_mode->clock);
 	switch (adjusted_mode->clock) {
 	case 74250:
 		// 74.25M

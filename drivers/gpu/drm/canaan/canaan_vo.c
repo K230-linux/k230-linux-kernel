@@ -248,10 +248,11 @@ static void canaan_vo_update_osd(struct canaan_vo *vo,
 			      VO_OSD0_7_ADDR_SEL_MODE_REG_OFFSET);
 
 	disp_en = readl(vo->reg_base + VO_DISP_ENABLE);
+	dev_info(vo->dev, "OSD plane enable: read DISP_ENABLE=0x%08x, setting bit=%d\n",
+		 disp_en, plane_enable_bit);
 	disp_en |= 1 << plane_enable_bit;
 	writel(disp_en, vo->reg_base + VO_DISP_ENABLE);
-	dev_info(vo->dev, "OSD plane enabled: DISP_ENABLE=0x%08x, bit=%d\n",
-		 disp_en, plane_enable_bit);
+	dev_info(vo->dev, "OSD plane enabled: wrote DISP_ENABLE=0x%08x\n", disp_en);
 
 	DRM_DEBUG_DRIVER(
 		"OSD_INFO_REG: 0x%02x\n",
