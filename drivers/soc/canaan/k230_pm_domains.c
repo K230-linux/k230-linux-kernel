@@ -204,6 +204,7 @@ int k230_pd_probe(struct platform_device *pdev,
     k230_pm_domains[K230_PM_DOMAIN_DISP]->flags |= GENPD_FLAG_ALWAYS_ON;
 
     for (i = 0; i < domain_num; ++i) {
+        int ret;
         k230_pm_domains[i]->power_on = k230_power_on;
         k230_pm_domains[i]->power_off = k230_power_off;
 
@@ -211,7 +212,14 @@ int k230_pd_probe(struct platform_device *pdev,
          * DISP domain: Keep original init as OFF - bootloader doesn't power it on.
          * But with ALWAYS_ON flag above, kernel will power it on and keep it on.
          */
-        pm_genpd_init(k230_pm_domains[i], NULL, i != K230_PM_DOMAIN_DISP ? false : true);
+        ret = pm_genpd_init(k230_pm_domains[i], NULL, i != K230_PM_DOMAIN_DISP ? false : true);
+        if (ret) {
+            dev_err(&pdev->dev, "Failed to init domain %d (%s): %d\n",
+                    i, k230_pm_domains[i]->name, ret);
+            return ret;
+        }
+        dev_info(&pdev->dev, "Initialized domain %d: %s (is_off=%d)\n",
+                 i, k230_pm_domains[i]->name, i != K230_PM_DOMAIN_DISP ? 0 : 1);
     }
 
     of_genpd_add_provider_onecell(pdev->dev.of_node, genpd_data);
