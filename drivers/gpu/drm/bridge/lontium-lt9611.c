@@ -213,30 +213,22 @@ static void lt9611_pcr_setup(struct lt9611 *lt9611, const struct drm_display_mod
 		/* stage 2 */
 		{ 0x834a, 0x40 },
 
-		/* MK limit */
-		{ 0x832d, 0x38 },
+		/* MK limit - K230 uses 0x40 instead of 0x38 */
+		{ 0x832d, 0x40 },
 		{ 0x8331, 0x08 },
 	};
-	u8 pol = 0x10;
 
-	if (mode->flags & DRM_MODE_FLAG_NHSYNC)
-		pol |= 0x2;
-	if (mode->flags & DRM_MODE_FLAG_NVSYNC)
-		pol |= 0x1;
-	regmap_write(lt9611->regmap, 0x831d, pol);
+	/*
+	 * K230 SDK uses fixed polarity (0x10) instead of dynamic calculation.
+	 * The polarity bits seem to cause issues with K230 hardware.
+	 */
+	regmap_write(lt9611->regmap, 0x831d, 0x10);
 
 	regmap_multi_reg_write(lt9611->regmap, reg_cfg, ARRAY_SIZE(reg_cfg));
-	if (lt9611->dsi1_node) {
-		unsigned int hact = mode->hdisplay;
 
-		hact >>= 2;
-		hact += 0x50;
-		hact = min(hact, 0x3e0U);
-		regmap_write(lt9611->regmap, 0x830b, hact / 256);
-		regmap_write(lt9611->regmap, 0x830c, hact % 256);
-		regmap_write(lt9611->regmap, 0x8348, hact / 256);
-		regmap_write(lt9611->regmap, 0x8349, hact % 256);
-	}
+	/*
+	 * K230 SDK removes dual-DSI logic - we only use single port
+	 */
 
 	regmap_write(lt9611->regmap, 0x8326, pcr_m);
 
@@ -251,12 +243,12 @@ static int lt9611_pll_setup(struct lt9611 *lt9611, const struct drm_display_mode
 	const struct reg_sequence reg_cfg[] = {
 		/* txpll init */
 		{ 0x8123, 0x40 },
-		{ 0x8124, 0x64 },
+		{ 0x8124, 0x62 },  /* K230 SDK: 0x62 instead of 0x64 */
 		{ 0x8125, 0x80 },
 		{ 0x8126, 0x55 },
 		{ 0x812c, 0x37 },
 		{ 0x812f, 0x01 },
-		{ 0x8126, 0x55 },
+		/* K230 SDK: removed duplicate 0x8126 write */
 		{ 0x8127, 0x66 },
 		{ 0x8128, 0x88 },
 		{ 0x812a, 0x20 },
@@ -422,10 +414,11 @@ static void lt9611_hdmi_tx_phy(struct lt9611 *lt9611)
 		{ 0x8136, 0x00 },
 		{ 0x8137, 0x44 },
 		{ 0x813f, 0x0f },
-		{ 0x8140, 0xa0 },
-		{ 0x8141, 0xa0 },
-		{ 0x8142, 0xa0 },
-		{ 0x8143, 0xa0 },
+		/* K230 SDK: reduced drive strength from 0xa0 to 0x98 */
+		{ 0x8140, 0x98 },
+		{ 0x8141, 0x98 },
+		{ 0x8142, 0x98 },
+		{ 0x8143, 0x98 },
 		{ 0x8144, 0x0a },
 	};
 
