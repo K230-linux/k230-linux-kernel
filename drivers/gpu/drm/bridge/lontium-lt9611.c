@@ -748,9 +748,13 @@ lt9611_bridge_atomic_enable(struct drm_bridge *bridge,
 	lt9611_hdmi_tx_digital(lt9611, connector->display_info.is_hdmi);
 	lt9611_hdmi_tx_phy(lt9611);
 
-	msleep(500);
-
-	lt9611_video_check(lt9611);
+	/*
+	 * Don't check video here - this runs before planes are active,
+	 * so DSI isn't transmitting frames yet. Video will start flowing
+	 * once the first framebuffer is committed.
+	 */
+	/* msleep(500); */
+	/* lt9611_video_check(lt9611); */
 
 	/* Enable HDMI output */
 	regmap_write(lt9611->regmap, 0x8130, 0xea);
