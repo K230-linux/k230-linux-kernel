@@ -201,6 +201,7 @@ int k230_pd_probe(struct platform_device *pdev,
     k230_pm_domains[K230_PM_DOMAIN_AI]->flags |= GENPD_FLAG_ALWAYS_ON;
     k230_pm_domains[K230_PM_DOMAIN_VPU]->flags |= GENPD_FLAG_ALWAYS_ON;
     k230_pm_domains[K230_PM_DOMAIN_DPU]->flags |= GENPD_FLAG_ALWAYS_ON;
+    k230_pm_domains[K230_PM_DOMAIN_DISP]->flags |= GENPD_FLAG_ALWAYS_ON;
 
     for (i = 0; i < domain_num; ++i) {
         k230_pm_domains[i]->power_on = k230_power_on;
