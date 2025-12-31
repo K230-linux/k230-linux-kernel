@@ -162,12 +162,12 @@ static void lt9611_mipi_video_setup(struct lt9611 *lt9611,
 	hactive = mode->hdisplay;
 	hsync_len = mode->hsync_end - mode->hsync_start;
 	hfront_porch = mode->hsync_start - mode->hdisplay;
-	hsync_porch = mode->htotal - mode->hsync_start;
+	hsync_porch = hsync_len + mode->htotal - mode->hsync_end;
 
 	vactive = mode->vdisplay;
 	vsync_len = mode->vsync_end - mode->vsync_start;
 	vfront_porch = mode->vsync_start - mode->vdisplay;
-	vsync_porch = mode->vtotal - mode->vsync_start;
+	vsync_porch = vsync_len + mode->vtotal - mode->vsync_end;
 
 	regmap_write(lt9611->regmap, 0x830d, (u8)(v_total / 256));
 	regmap_write(lt9611->regmap, 0x830e, (u8)(v_total % 256));
@@ -197,7 +197,7 @@ static void lt9611_mipi_video_setup(struct lt9611 *lt9611,
 
 static void lt9611_pcr_setup(struct lt9611 *lt9611, const struct drm_display_mode *mode, unsigned int postdiv)
 {
-	unsigned int pcr_m = mode->clock * 5 * postdiv / 27000;
+	unsigned int pcr_m = (mode->clock * 5 * postdiv / 27000) - 1;
 	const struct reg_sequence reg_cfg[] = {
 		{ 0x830b, 0x01 },
 		{ 0x830c, 0x10 },
@@ -267,7 +267,7 @@ static int lt9611_pll_setup(struct lt9611 *lt9611, const struct drm_display_mode
 	if (pclk > 150000) {
 		regmap_write(lt9611->regmap, 0x812d, 0x88);
 		*postdiv = 1;
-	} else if (pclk > 70000) {
+	} else if (pclk > 80000) {
 		regmap_write(lt9611->regmap, 0x812d, 0x99);
 		*postdiv = 2;
 	} else {
