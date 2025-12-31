@@ -199,27 +199,36 @@ int k230_pd_probe(struct platform_device *pdev,
 
     k230_pm_domains[K230_PM_DOMAIN_CPU1]->flags |= GENPD_FLAG_ALWAYS_ON;
     k230_pm_domains[K230_PM_DOMAIN_AI]->flags |= GENPD_FLAG_ALWAYS_ON;
-    k230_pm_domains[K230_PM_DOMAIN_VPU]->flags |= GENPD_FLAG_ALWAYS_ON;
+    /* VPU is power-gatable, not always-on */
+    /* k230_pm_domains[K230_PM_DOMAIN_VPU]->flags |= GENPD_FLAG_ALWAYS_ON; */
     k230_pm_domains[K230_PM_DOMAIN_DPU]->flags |= GENPD_FLAG_ALWAYS_ON;
-    k230_pm_domains[K230_PM_DOMAIN_DISP]->flags |= GENPD_FLAG_ALWAYS_ON;
+    /* DISP is power-gatable, not always-on */
 
     for (i = 0; i < domain_num; ++i) {
         int ret;
+        bool is_off;
+
         k230_pm_domains[i]->power_on = k230_power_on;
         k230_pm_domains[i]->power_off = k230_power_off;
 
         /*
-         * All domains initialized as ON (false). DISP has ALWAYS_ON flag,
-         * so kernel will keep it powered on and never shut it down.
+         * DISP and VPU are initialized as OFF (power-gatable).
+         * Others (CPU1, AI, DPU) are initialized as ON (always-on).
+         * This matches the SDK configuration.
          */
-        ret = pm_genpd_init(k230_pm_domains[i], NULL, false);
+        if (i == K230_PM_DOMAIN_DISP || i == K230_PM_DOMAIN_VPU)
+            is_off = true;
+        else
+            is_off = false;
+
+        ret = pm_genpd_init(k230_pm_domains[i], NULL, is_off);
         if (ret) {
             dev_err(&pdev->dev, "Failed to init domain %d (%s): %d\n",
                     i, k230_pm_domains[i]->name, ret);
             return ret;
         }
         dev_info(&pdev->dev, "Initialized domain %d: %s (is_off=%d)\n",
-                 i, k230_pm_domains[i]->name, i != K230_PM_DOMAIN_DISP ? 0 : 1);
+                 i, k230_pm_domains[i]->name, is_off);
     }
 
     of_genpd_add_provider_onecell(pdev->dev.of_node, genpd_data);
