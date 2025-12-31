@@ -209,10 +209,10 @@ int k230_pd_probe(struct platform_device *pdev,
         k230_pm_domains[i]->power_off = k230_power_off;
 
         /*
-         * DISP domain: Keep original init as OFF - bootloader doesn't power it on.
-         * But with ALWAYS_ON flag above, kernel will power it on and keep it on.
+         * All domains initialized as ON (false). DISP has ALWAYS_ON flag,
+         * so kernel will keep it powered on and never shut it down.
          */
-        ret = pm_genpd_init(k230_pm_domains[i], NULL, i != K230_PM_DOMAIN_DISP ? false : true);
+        ret = pm_genpd_init(k230_pm_domains[i], NULL, false);
         if (ret) {
             dev_err(&pdev->dev, "Failed to init domain %d (%s): %d\n",
                     i, k230_pm_domains[i]->name, ret);
