@@ -726,19 +726,37 @@ lt9611_bridge_atomic_enable(struct drm_bridge *bridge,
 
 	mode = &crtc_state->adjusted_mode;
 
+	dev_info(lt9611->dev, "Bridge enable: mode=%ux%u@%uHz, clock=%u\n",
+		 mode->hdisplay, mode->vdisplay, drm_mode_vrefresh(mode), mode->clock);
+
+	dev_dbg(lt9611->dev, "Step 1: MIPI input digital config\n");
 	lt9611_mipi_input_digital(lt9611, mode);
+
+	dev_dbg(lt9611->dev, "Step 2: PLL setup\n");
 	lt9611_pll_setup(lt9611, mode, &postdiv);
+
+	dev_dbg(lt9611->dev, "Step 3: MIPI video setup\n");
 	lt9611_mipi_video_setup(lt9611, mode);
+
+	dev_dbg(lt9611->dev, "Step 4: PCR setup\n");
 	lt9611_pcr_setup(lt9611, mode, postdiv);
 
+	dev_dbg(lt9611->dev, "Step 5: Power on LT9611\n");
 	if (lt9611_power_on(lt9611)) {
 		dev_err(lt9611->dev, "power on failed\n");
 		return;
 	}
 
+	dev_dbg(lt9611->dev, "Step 6: MIPI input analog config\n");
 	lt9611_mipi_input_analog(lt9611);
+
+	dev_dbg(lt9611->dev, "Step 7: Set HDMI infoframes\n");
 	lt9611_hdmi_set_infoframes(lt9611, connector, mode);
+
+	dev_dbg(lt9611->dev, "Step 8: HDMI TX digital config\n");
 	lt9611_hdmi_tx_digital(lt9611, connector->display_info.is_hdmi);
+
+	dev_dbg(lt9611->dev, "Step 9: HDMI TX PHY config\n");
 	lt9611_hdmi_tx_phy(lt9611);
 
 	/*
@@ -750,7 +768,10 @@ lt9611_bridge_atomic_enable(struct drm_bridge *bridge,
 	/* lt9611_video_check(lt9611); */
 
 	/* Enable HDMI output */
+	dev_info(lt9611->dev, "Step 10: Enable HDMI output (0x8130=0xea)\n");
 	regmap_write(lt9611->regmap, 0x8130, 0xea);
+
+	dev_info(lt9611->dev, "Bridge enable complete\n");
 }
 
 static void
