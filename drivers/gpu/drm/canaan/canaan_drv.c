@@ -248,6 +248,13 @@ static int canaan_drm_bind(struct device *dev)
 	drm_dev->mode_config.funcs = &canaan_drm_mode_config_funcs;
 	drm_dev->mode_config.helper_private = &canaan_drm_mode_config_helpers;
 
+	/* Power on DISP domain before accessing hardware */
+	ret = pm_runtime_get_sync(dev);
+	if (ret < 0) {
+		DRM_DEV_ERROR(dev, "Failed to power on display: %d\n", ret);
+		goto cleanup_mode_config;
+	}
+
 	ret = component_bind_all(dev, drm_dev);
 	if (ret) {
 		DRM_DEV_ERROR(dev, "Failed to bind all components\n");
@@ -278,6 +285,7 @@ finish_poll:
 	drm_kms_helper_poll_fini(drm_dev);
 unbind_all:
 	component_unbind_all(dev, drm_dev);
+	pm_runtime_put(dev);
 cleanup_mode_config:
 	drm_mode_config_cleanup(drm_dev);
 
@@ -297,6 +305,7 @@ static void canaan_drm_unbind(struct device *dev)
 	drm_mode_config_cleanup(drm_dev);
 	dev_set_drvdata(dev, NULL);
 	drm_dev_put(drm_dev);
+	pm_runtime_put(dev);
 }
 
 static const struct component_master_ops canaan_drm_master_ops = {
