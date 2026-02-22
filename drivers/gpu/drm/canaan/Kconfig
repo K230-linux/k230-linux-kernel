@@ -21,6 +21,8 @@ if DRM_CANAAN
 config DRM_CANAAN_DSI
 	bool "Canaan K230 MIPI-DSI Controller Support"
 	select DRM_MIPI_DSI
+	select DRM_DISPLAY_HELPER
+	select DRM_BRIDGE_CONNECTOR
 	default DRM_CANAAN
 	help
 	  Choose this option if you have a Canaan K230 soc chipset.
