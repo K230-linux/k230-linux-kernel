@@ -51,6 +51,8 @@ int canaan_drm_gem_dma_mmap(struct drm_gem_dma_object *dma_obj, struct vm_area_s
 	vma->vm_pgoff -= drm_vma_node_start(&obj->vma_node);
 	vm_flags_mod(vma, VM_DONTEXPAND, VM_PFNMAP);
 
+	vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+
 	ret = remap_pfn_range(
 		vma,
 		vma->vm_start,

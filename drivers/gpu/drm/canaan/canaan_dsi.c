@@ -74,7 +74,7 @@
 
 #define TXPHY_891_M (295)
 #define TXPHY_891_N (15)
-#define TXPHY_891_VOC (0x07)
+#define TXPHY_891_VOC (0x09)
 #define TXPHY_891_HS_FREQ (0x96)
 
 #define TXPHY_475_M (196)
