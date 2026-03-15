@@ -483,17 +483,13 @@ static void canaan_vo_set_timing(struct canaan_vo *vo,
 	vfp = mode->vtotal - vsa - vbp - vact;
 	vtotal = mode->vtotal;
 
-	// HSYNC/VSYNC timing: bits [12:0] = start, bits [28:16] = end
-	// HSYNC pulse: start=0, end=hsa-1
-	reg = ((hsa - 1) << 16) + 0;
-	canaan_vo_write(vo, VO_DISP_HSYNC_CTL, reg);
-	canaan_vo_write(vo, VO_DISP_HSYNC1_CTL, reg);
-	canaan_vo_write(vo, VO_DISP_HSYNC2_CTL, reg);
+	// HSYNC/VSYNC: internal DPI interface timing (not output sync width)
+	canaan_vo_write(vo, VO_DISP_HSYNC_CTL, (0x2 << 16) + 0x1);
+	canaan_vo_write(vo, VO_DISP_HSYNC1_CTL, (0x6 << 16) + 0x5);
+	canaan_vo_write(vo, VO_DISP_HSYNC2_CTL, (0x5 << 16) + 0x1);
 
-	// VSYNC pulse: start=0, end=vsa-1
-	reg = ((vsa - 1) << 16) + 0;
-	canaan_vo_write(vo, VO_DISP_VSYNC1_CTL, reg);
-	canaan_vo_write(vo, VO_DISP_VSYNC2_CTL, reg);
+	canaan_vo_write(vo, VO_DISP_VSYNC1_CTL, (0x1 << 16) + 0x1);
+	canaan_vo_write(vo, VO_DISP_VSYNC2_CTL, (0x1 << 16) + 0x1);
 
 	pr_info("VO timing: htotal=%d, hsa=%d, hbp=%d, hact=%d\n",
 		htotal, hsa, hbp, hact);
@@ -505,7 +501,7 @@ static void canaan_vo_set_timing(struct canaan_vo *vo,
 
 	// set yzone
 	reg = 0;
-	reg = (vbp) + (((vact + (vbp)) - 1) << 16);
+	reg = (vbp + 1) + (((vact + (vbp + 1)) - 1) << 16);
 	canaan_vo_write(vo, VO_DISP_YZONE_CTL, reg);
 
 	// set total size
