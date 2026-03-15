@@ -258,7 +258,7 @@ static int canaan_drm_bind(struct device *dev)
 	ret = component_bind_all(dev, drm_dev);
 	if (ret) {
 		DRM_DEV_ERROR(dev, "Failed to bind all components\n");
-		goto unbind_all;
+		goto put_runtime;
 	}
 
 	ret = drm_vblank_init(drm_dev, drm_dev->mode_config.num_crtc);
@@ -285,6 +285,7 @@ finish_poll:
 	drm_kms_helper_poll_fini(drm_dev);
 unbind_all:
 	component_unbind_all(dev, drm_dev);
+put_runtime:
 	pm_runtime_put(dev);
 cleanup_mode_config:
 	drm_mode_config_cleanup(drm_dev);
