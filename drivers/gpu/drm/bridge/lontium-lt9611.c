@@ -258,10 +258,20 @@ static int lt9611_pll_setup(struct lt9611 *lt9611, const struct drm_display_mode
 	regmap_write(lt9611->regmap, 0x82e4, pclk / 256);
 	regmap_write(lt9611->regmap, 0x82e5, pclk % 256);
 
+	/* PCR reset */
+	regmap_write(lt9611->regmap, 0x8011, 0x5a);
+	regmap_write(lt9611->regmap, 0x8011, 0xfa);
+
+	/* PLL calibration reset */
 	regmap_write(lt9611->regmap, 0x82de, 0x20);
 	regmap_write(lt9611->regmap, 0x82de, 0xe0);
 
-	regmap_write(lt9611->regmap, 0x8016, 0xf1);
+	regmap_write(lt9611->regmap, 0x8016, 0xf2);
+
+	/* Clock domain reset - required for HDMI TX TMDS output */
+	regmap_write(lt9611->regmap, 0x8018, 0xdc);
+	regmap_write(lt9611->regmap, 0x8018, 0xfc);
+
 	regmap_write(lt9611->regmap, 0x8016, 0xf3);
 
 	return 0;
@@ -723,6 +733,27 @@ lt9611_bridge_atomic_enable(struct drm_bridge *bridge,
 	msleep(500);
 
 	lt9611_video_check(lt9611);
+
+	/*
+	 * Full PLL recalibration and HDMI output enable sequence.
+	 * Must happen after MIPI input is stable (after video_check).
+	 */
+
+	/* PLL calibration reset */
+	regmap_write(lt9611->regmap, 0x82de, 0x20);
+	regmap_write(lt9611->regmap, 0x82de, 0xe0);
+
+	/* Clock domain reset */
+	regmap_write(lt9611->regmap, 0x8018, 0xdc);
+	regmap_write(lt9611->regmap, 0x8018, 0xfc);
+
+	/* PLL power sequence */
+	regmap_write(lt9611->regmap, 0x8016, 0xf1);
+	regmap_write(lt9611->regmap, 0x8016, 0xf3);
+
+	/* PCR reset */
+	regmap_write(lt9611->regmap, 0x8011, 0x5a);
+	regmap_write(lt9611->regmap, 0x8011, 0xfa);
 
 	/* Enable HDMI output */
 	regmap_write(lt9611->regmap, 0x8130, 0xea);
