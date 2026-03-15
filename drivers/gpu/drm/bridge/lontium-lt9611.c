@@ -225,6 +225,7 @@ static void lt9611_pcr_setup(struct lt9611 *lt9611, const struct drm_display_mod
 static int lt9611_pll_setup(struct lt9611 *lt9611, const struct drm_display_mode *mode, unsigned int *postdiv)
 {
 	unsigned int pclk = mode->clock;
+	unsigned int pcr_m;
 	const struct reg_sequence reg_cfg[] = {
 		/* txpll init */
 		{ 0x8123, 0x40 },
@@ -251,6 +252,12 @@ static int lt9611_pll_setup(struct lt9611 *lt9611, const struct drm_display_mode
 		*postdiv = 4;
 	}
 
+	/* MK limit + pcr_m with lock enable bit (SDK writes these in pll_setup) */
+	pcr_m = pclk * 5 * (*postdiv) / 27000 - 1;
+	regmap_write(lt9611->regmap, 0x832d, 0x40);
+	regmap_write(lt9611->regmap, 0x8331, 0x08);
+	regmap_write(lt9611->regmap, 0x8326, 0x80 | pcr_m);
+
 	/* pixel clock: divide by 2 and split into 3 bytes */
 	pclk = pclk / 2;
 	regmap_write(lt9611->regmap, 0x82e3, pclk / 65536);
@@ -258,13 +265,13 @@ static int lt9611_pll_setup(struct lt9611 *lt9611, const struct drm_display_mode
 	regmap_write(lt9611->regmap, 0x82e4, pclk / 256);
 	regmap_write(lt9611->regmap, 0x82e5, pclk % 256);
 
-	/* PCR reset */
-	regmap_write(lt9611->regmap, 0x8011, 0x5a);
-	regmap_write(lt9611->regmap, 0x8011, 0xfa);
-
 	/* PLL calibration reset */
 	regmap_write(lt9611->regmap, 0x82de, 0x20);
 	regmap_write(lt9611->regmap, 0x82de, 0xe0);
+
+	/* PCR reset */
+	regmap_write(lt9611->regmap, 0x8011, 0x5a);
+	regmap_write(lt9611->regmap, 0x8011, 0xfa);
 
 	regmap_write(lt9611->regmap, 0x8016, 0xf2);
 
@@ -717,8 +724,8 @@ lt9611_bridge_atomic_enable(struct drm_bridge *bridge,
 
 	lt9611_mipi_input_digital(lt9611, mode);
 	lt9611_pll_setup(lt9611, mode, &postdiv);
-	lt9611_mipi_video_setup(lt9611, mode);
 	lt9611_pcr_setup(lt9611, mode, postdiv);
+	lt9611_mipi_video_setup(lt9611, mode);
 
 	if (lt9611_power_on(lt9611)) {
 		dev_err(lt9611->dev, "power on failed\n");
