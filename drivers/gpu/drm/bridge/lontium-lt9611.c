@@ -649,6 +649,8 @@ lt9611_bridge_atomic_enable(struct drm_bridge *bridge,
 {
 	struct lt9611 *lt9611 = bridge_to_lt9611(bridge);
 
+	dev_info(lt9611->dev, "bridge atomic_enable called\n");
+
 	if (lt9611_power_on(lt9611)) {
 		dev_err(lt9611->dev, "power on failed\n");
 		return;
@@ -775,6 +777,8 @@ static void lt9611_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 		{ 0x8130, 0xea },
 		{ 0x8011, 0xfa },
 	};
+
+	dev_info(lt9611->dev, "bridge atomic_pre_enable called\n");
 
 	if (lt9611->sleep) {
 		regmap_multi_reg_write(lt9611->regmap,
