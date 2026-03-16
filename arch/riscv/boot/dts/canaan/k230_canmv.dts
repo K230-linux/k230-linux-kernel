@@ -26,7 +26,17 @@
 		stdout-path = "serial0:115200";
 	};
 
-	/* hdmi-connector node removed -- LT9611 handles connector internally */
+	hdmi: connector {
+		compatible = "hdmi-connector";
+		label = "hdmi";
+		type = "a";
+
+		port {
+			hdmi_connector_in: endpoint {
+				remote-endpoint = <&lt9611_out>;
+			};
+		};
+	};
 };
 &ddr {
 	reg = <0x0 0x200000 0x0 0x1fdff000>;  /*linux memory config*/
@@ -155,7 +165,12 @@
 				};
 			};
 
-			/* port@2 removed -- no display-connector bridge needed */
+			port@2 {
+				reg = <2>;
+				lt9611_out: endpoint {
+					remote-endpoint = <&hdmi_connector_in>;
+				};
+			};
 		};
 	};
 };
