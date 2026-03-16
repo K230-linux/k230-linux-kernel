@@ -158,8 +158,8 @@
 		ports {
 			#address-cells  = <1>;
 			#size-cells     = <0>;
-			port@1 {
-				reg = <1>;
+			port@0 {
+				reg = <0>;
 				lt9611_in: endpoint {
 					remote-endpoint = <&dsi_out_lt9611>;
 				};
