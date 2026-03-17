@@ -1,0 +1,162 @@
+/* Copyright (c) 2023, Canaan Bright Sight Co., Ltd
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+#include "k230.dtsi"
+#include "clock_provider.dtsi"          /* k230 soc clock tree */
+#include "clock_consumer.dtsi"          /* k230 soc clock consumer */
+#include "reset_provider.dtsi"          /* k230 soc reset provider */
+#include "reset_consumer.dtsi"          /* k230 soc reset consumer */
+#include "power_provider.dtsi"          /* k230 soc power provider */
+#include "power_consumer.dtsi"          /* k230 soc power consumer */
+#include "gpio_provider.dtsi"           /* k230 soc gpio provider */
+#include "gpio_consumer.dtsi"           /* k230 soc gpio consumer */
+
+/ {
+	aliases {
+		serial0 = &uart0;
+	};
+
+	chosen {
+		bootargs = "earlycon=sbi console=ttyS0,115200 loglevel=8 root=/dev/mmcblk1p2 rw rootwait audit=0";
+		linux,initrd-start = <0x0 0xa100000>;
+		linux,initrd-end = <0x0 0x0>;
+		stdout-path = "serial0:115200";
+	};
+
+	hdmi: connector {
+		compatible = "hdmi-connector";
+		label = "hdmi";
+		type = "a";
+
+		port {
+			hdmi_connector_in: endpoint {
+				remote-endpoint = <&lt9611_out>;
+			};
+		};
+	};
+};
+
+&ddr {
+	reg = <0x0 0x200000 0x0 0x3fdff000>;  /* 1GB RAM (minus reserved) */
+};
+
+&spi0 {
+	status = "okay";
+	spi-flash@0 {
+		compatible = "jedec,spi-nor";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0>;
+		spi-max-frequency = <100000000>;
+		spi-tx-bus-width = <8>;
+		spi-rx-bus-width = <8>;
+		status = "okay";
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+			/* spl boot */
+			reg = <0x0 0x00080000>;
+			label = "spl_boot";
+			};
+			partition@2000000 {
+			/* 32MB for  update image*/
+			reg = <0 0x2000000>;
+			label = "all_flash";
+			};
+		};
+	};
+
+};
+
+&usbotg0 {
+	dr_mode = "host";
+	status = "okay";
+};
+
+&usbotg1 {
+	dr_mode = "host";
+	status = "okay";
+};
+
+&gpio22 {
+	status = "okay";
+};
+
+&gpio23 {
+	status = "okay";
+};
+
+&mmc_sd0{
+    status = "okay";
+    no-1-8-v;
+    cap-sd-highspeed;
+    rx_delay_line = <0x0d>;
+    tx_delay_line = <0xb0>;
+};
+
+&mmc_sd1{
+    status = "okay";
+    no-1-8-v;
+    cap-sd-highspeed;
+    mshc_ctrl_r = <0x00>;
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&i2c3 {
+	status = "okay";
+
+	lt9611: hdmi-bridge@3b {
+		compatible = "lontium,lt9611";
+		reg = <0x3b>;
+		reset-gpios = <&port22 0 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&gpio23>;
+		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
+		ports {
+			#address-cells  = <1>;
+			#size-cells     = <0>;
+			port@0 {
+				reg = <0>;
+				lt9611_in: endpoint {
+					remote-endpoint = <&dsi_out_lt9611>;
+				};
+			};
+
+			port@2 {
+				reg = <2>;
+				lt9611_out: endpoint {
+					remote-endpoint = <&hdmi_connector_in>;
+				};
+			};
+		};
+	};
+};
+
+&i2c4 {
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+
+	ports {
+		port@1 {
+			reg = <1>;
+			dsi_out_lt9611: endpoint {
+				remote-endpoint = <&lt9611_in>;
+			};
+		};
+	};
+};
+
+&vo {
+	vth_line = <10>;
+};
