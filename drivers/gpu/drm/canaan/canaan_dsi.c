@@ -344,7 +344,7 @@ static int canaan_dsi_clk_cfg(struct canaan_dsi *dsi, u32 clk)
 	else if (phy_clk_freq < 440000)
 		voc = 0x0f;
 	else if (phy_clk_freq < 660000)
-		voc = 0x07;
+		voc = 0x09; /* K230-specific: 0x07 per spec but 0x09 needed for this SoC */
 	else if (phy_clk_freq < 1149000)
 		voc = 0x03;
 	else
