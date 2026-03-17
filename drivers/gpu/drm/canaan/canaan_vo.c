@@ -180,7 +180,7 @@ static void canaan_vo_update_osd(struct canaan_vo *vo,
 	case DRM_FORMAT_ARGB8888:
 	case DRM_FORMAT_XRGB8888:
 		reg_val = 0x53;
-		rb_swap = 0x4F;
+		rb_swap = 0x0F;
 		break;
 	case DRM_FORMAT_ARGB4444:
 		reg_val = 0x54;
