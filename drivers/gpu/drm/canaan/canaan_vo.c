@@ -519,9 +519,7 @@ void canaan_vo_enable_crtc(struct canaan_vo *vo,
 			   struct canaan_crtc *canaan_crtc,
 			   struct drm_display_mode *adjusted_mode)
 {
-	/* Perform display reset before initialization */
-	canaan_vo_display_reset(vo);
-
+	canaan_vo_software_reset(vo);
 	canaan_vo_init(vo);
 	// set timing
 	canaan_vo_set_timing(vo, adjusted_mode);
