@@ -279,7 +279,7 @@ static int canaan_drm_bind(struct device *dev)
 		goto finish_poll;
 	}
 
-	drm_fbdev_dma_setup(drm_dev, 32);
+	drm_fbdev_dma_setup(drm_dev, 24);
 	DRM_DEV_INFO(dev, "Canaan K230 DRM driver register successfully\n");
 
 	return 0;
