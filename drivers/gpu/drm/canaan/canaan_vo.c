@@ -483,13 +483,13 @@ static void canaan_vo_set_timing(struct canaan_vo *vo,
 	vfp = mode->vtotal - vsa - vbp - vact;
 	vtotal = mode->vtotal;
 
-	// HSYNC/VSYNC: internal DPI interface timing (not output sync width)
-	canaan_vo_write(vo, VO_DISP_HSYNC_CTL, (0x2 << 16) + 0x1);
-	canaan_vo_write(vo, VO_DISP_HSYNC1_CTL, (0x6 << 16) + 0x5);
-	canaan_vo_write(vo, VO_DISP_HSYNC2_CTL, (0x5 << 16) + 0x1);
+	// HSYNC/VSYNC: internal DPI interface timing (matching SDK xuantie kernel)
+	canaan_vo_write(vo, VO_DISP_HSYNC_CTL, (0x5 << 16) + 0x2);
+	canaan_vo_write(vo, VO_DISP_HSYNC1_CTL, (0x5 << 16) + 0x2);
+	canaan_vo_write(vo, VO_DISP_HSYNC2_CTL, (0x5 << 16) + 0x2);
 
-	canaan_vo_write(vo, VO_DISP_VSYNC1_CTL, (0x1 << 16) + 0x1);
-	canaan_vo_write(vo, VO_DISP_VSYNC2_CTL, (0x1 << 16) + 0x1);
+	canaan_vo_write(vo, VO_DISP_VSYNC1_CTL, 0);
+	canaan_vo_write(vo, VO_DISP_VSYNC2_CTL, 0);
 
 	pr_info("VO timing: htotal=%d, hsa=%d, hbp=%d, hact=%d\n",
 		htotal, hsa, hbp, hact);
@@ -512,25 +512,22 @@ static void canaan_vo_set_timing(struct canaan_vo *vo,
 	// set draw
 	reg = 0;
 	reg = (hact - 1) + ((vact - 1) << 16) + (0x1 << 15);
-	canaan_vo_write(vo, 0x780, reg); // enalbe remap  0x77f8437
+	canaan_vo_write(vo, 0x780, reg);
+
+	// vline IRQ threshold (matching SDK)
+	reg = 32 - __builtin_clz(vtotal) - 1;
+	canaan_vo_write(vo, VO_DISP_IRQ1_CTL, reg);
 }
 
 void canaan_vo_enable_crtc(struct canaan_vo *vo,
 			   struct canaan_crtc *canaan_crtc,
 			   struct drm_display_mode *adjusted_mode)
 {
-	canaan_vo_software_reset(vo);
 	canaan_vo_init(vo);
 	// set timing
 	canaan_vo_set_timing(vo, adjusted_mode);
 	// set background
-	canaan_vo_write(vo, VO_DISP_BACKGROUND,
-			0xffffff); // enalbe remap  0x77f8437
-
-	// Enable display output - set bit 0 of DISP_CTL
-	canaan_vo_write(vo, VO_DISP_CTL,
-			canaan_vo_read(vo, VO_DISP_CTL) | 0x1);
-
+	canaan_vo_write(vo, VO_DISP_BACKGROUND, 0xffffff);
 	// enable vo
 	canaan_vo_write(vo, VO_REG_LOAD_CTL, 0x11);
 
