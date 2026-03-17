@@ -75,16 +75,17 @@ static void canaan_crtc_atomic_disable(struct drm_crtc *crtc,
 	struct canaan_vo *vo = canaan_crtc->vo;
 
 	DRM_DEBUG_DRIVER("Disable the CRTC:%d\n", crtc->base.id);
-	drm_crtc_vblank_off(crtc);
-	canaan_vo_disable_crtc(vo, canaan_crtc);
 
-	if (crtc->state->event && !crtc->state->active) {
+	/* Send any pending event before disabling vblank */
+	if (crtc->state->event) {
 		spin_lock_irq(&crtc->dev->event_lock);
 		drm_crtc_send_vblank_event(crtc, crtc->state->event);
 		spin_unlock_irq(&crtc->dev->event_lock);
-
 		crtc->state->event = NULL;
 	}
+
+	drm_crtc_vblank_off(crtc);
+	canaan_vo_disable_crtc(vo, canaan_crtc);
 }
 
 static void canaan_crtc_atomic_flush(struct drm_crtc *crtc,
