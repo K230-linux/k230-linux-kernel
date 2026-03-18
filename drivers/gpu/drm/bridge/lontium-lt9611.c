@@ -1086,7 +1086,7 @@ static int lt9611_probe(struct i2c_client *client)
 	lt9611->bridge.funcs = &lt9611_bridge_funcs;
 	lt9611->bridge.of_node = client->dev.of_node;
 	lt9611->bridge.ops = DRM_BRIDGE_OP_DETECT | DRM_BRIDGE_OP_EDID |
-			     DRM_BRIDGE_OP_HPD | DRM_BRIDGE_OP_MODES;
+			     DRM_BRIDGE_OP_MODES;
 	lt9611->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
 
 	drm_bridge_add(&lt9611->bridge);
@@ -1107,6 +1107,8 @@ static int lt9611_probe(struct i2c_client *client)
 		}
 	}
 
+	/* Power on to configure IRQ routing for HPD detection */
+	lt9611_power_on(lt9611);
 	lt9611_enable_hpd_interrupts(lt9611);
 
 	ret = lt9611_audio_init(dev, lt9611);
