@@ -11,31 +11,23 @@
             key1 {
                 label = "gpio-key-33";
                 linux,code = <103>;
-                gpios = <&port33 0 GPIO_ACTIVE_HIGH>;
+                gpios = <&gpio1_ports 1 GPIO_ACTIVE_HIGH>;
                 debounce-interval = <3>;
             };
 
             key2 {
                 label = "gpio-key-27";
                 linux,code = <108>;
-                gpios = <&port27 0 GPIO_ACTIVE_HIGH>;
+                gpios = <&gpio0_ports 27 GPIO_ACTIVE_HIGH>;
                 debounce-interval = <3>;
             };
         };
 };
 
-&gpio23 {
+&gpio0 {
     status = "okay";
 };
 
-&gpio34 {
-    status = "okay";
-};
-
-&gpio27 {
-    status = "okay";
-};
-
-&gpio33 {
+&gpio1 {
     status = "okay";
 };

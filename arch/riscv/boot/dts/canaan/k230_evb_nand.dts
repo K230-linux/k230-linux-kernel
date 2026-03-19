@@ -31,13 +31,6 @@
 	reg = <0x0 0x8200000 0x0 0x7dff000>;  /*linux memory config*/
 };
 
-&gpio29 {
-	status = "okay";
-};
-
-&gpio30 {
-	status = "okay";
-};
 
 &i2c4 {
 	status = "okay";
@@ -45,10 +38,10 @@
 		compatible = "goodix,gt911";
 		reg = <0x14>;
 
-		interrupt-parent = <&port29>;
-		interrupts = <0 IRQ_TYPE_EDGE_RISING>; /*IRQ_TYPE_LEVEL_HIGH*/
-		irq-gpios = <&port29 0 GPIO_ACTIVE_HIGH>;
-		reset-gpios = <&port30 0 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&gpio0_ports>;
+		interrupts = <29 IRQ_TYPE_EDGE_RISING>;
+		irq-gpios = <&gpio0_ports 29 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio0_ports 30 GPIO_ACTIVE_HIGH>;
 
 		goodix,cfg-group0 = [
 			44 38 04 80 07 05 35 00 01 08
@@ -143,13 +136,9 @@
     tx_delay_line = <0xc0>;
 };
 
-&gpio53 {
-	status = "okay";
-};
-
 &mmc_sd1{
     status = "okay";
-    cd-gpios = <&port53 0 GPIO_ACTIVE_LOW>;
+    cd-gpios = <&gpio1_ports 21 GPIO_ACTIVE_LOW>;
     no-1-8-v;
     cap-sd-highspeed;
     mshc_ctrl_r = <0x00>;

@@ -39,13 +39,6 @@
     };
 };
 
-&gpio29 {
-	status = "okay";
-};
-
-&gpio30 {
-	status = "okay";
-};
 
 &i2c4 {
 	status = "okay";
@@ -124,17 +117,6 @@
 
 };
 
-&gpio18 {
-	status = "okay";
-};
-
-&gpio22 {
-	status = "okay";
-};
-
-&gpio20 {
-	status = "okay";
-};
 
 &spi1 {
 	status = "okay";
@@ -148,9 +130,9 @@
 		buswidth = <8>;
 		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <1>;
-		cs-gpios = <&port18 0 GPIO_ACTIVE_HIGH>;
-		dc-gpios = <&port22 0 GPIO_ACTIVE_HIGH>;
-		reset-gpios = <&port20 0 GPIO_ACTIVE_LOW>;
+		cs-gpios = <&gpio0_ports 18 GPIO_ACTIVE_HIGH>;
+		dc-gpios = <&gpio0_ports 22 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio0_ports 20 GPIO_ACTIVE_LOW>;
 	};
 };
 
@@ -163,13 +145,9 @@
     tx_delay_line = <0xc0>;
 };
 
-&gpio53 {
-	status = "okay";
-};
-
 &mmc_sd1{
     status = "okay";
-    cd-gpios = <&port53 0 GPIO_ACTIVE_LOW>;
+    cd-gpios = <&gpio1_ports 21 GPIO_ACTIVE_LOW>;
     no-1-8-v;
     cap-sd-highspeed;
     mshc_ctrl_r = <0x00>;

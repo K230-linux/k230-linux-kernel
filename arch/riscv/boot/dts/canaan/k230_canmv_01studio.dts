@@ -84,13 +84,6 @@
 	status = "okay";
 };
 
-&gpio22 {
-	status = "okay";
-};
-
-&gpio23 {
-	status = "okay";
-};
 
 &mmc_sd0{
     status = "okay";
@@ -117,9 +110,9 @@
 	lt9611: hdmi-bridge@3b {
 		compatible = "lontium,lt9611";
 		reg = <0x3b>;
-		reset-gpios = <&port22 0 GPIO_ACTIVE_HIGH>;
-		interrupt-parent = <&gpio23>;
-		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&gpio0_ports 22 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&gpio0_ports>;
+		interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
 		ports {
 			#address-cells  = <1>;
 			#size-cells     = <0>;

@@ -84,40 +84,20 @@
 	status = "okay";
 };
 
-&gpio52 {
-	status = "okay";
-};
-
-&gpio53 {
-	status = "okay";
-};
-
 &gpio_key {
 	S2 {
 		label = "gpio-key-52";
 		linux,code = <106>;
-		gpios = <&port52 0 GPIO_ACTIVE_LOW>;
+		gpios = <&gpio1_ports 20 GPIO_ACTIVE_LOW>;
 		debounce-interval = <3>;
 	};
 
 	S1 {
 		label = "gpio-key-53";
 		linux,code = <105>;
-		gpios = <&port53 0 GPIO_ACTIVE_HIGH>;
+		gpios = <&gpio1_ports 21 GPIO_ACTIVE_HIGH>;
 		debounce-interval = <3>;
 	};
-};
-
-&gpio1 {
-	status = "okay";
-};
-
-&gpio42 {
-	status = "okay";
-};
-
-&gpio43 {
-	status = "okay";
 };
 
 &mmc_sd0{
@@ -127,7 +107,7 @@
     tx_delay_line = <0x00>;
     bcmdhd_wlan {
         compatible = "android,bcmdhd_wlan";
-        gpio_wl_reg_on = <&port1 0 GPIO_ACTIVE_HIGH>;
+        gpio_wl_reg_on = <&gpio0_ports 1 GPIO_ACTIVE_HIGH>;
     };
 };
 
@@ -152,9 +132,9 @@
 	lt9611: hdmi-bridge@3b {
 		compatible = "lontium,lt9611";
 		reg = <0x3b>;
-		reset-gpios = <&port42 0 GPIO_ACTIVE_HIGH>;
-		interrupt-parent = <&gpio43>;
-		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&gpio1_ports 10 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&gpio1_ports>;
+		interrupts = <11 IRQ_TYPE_EDGE_FALLING>;
 		ports {
 			#address-cells  = <1>;
 			#size-cells     = <0>;
