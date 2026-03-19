@@ -807,9 +807,6 @@ static void
 lt9611_bridge_atomic_post_disable(struct drm_bridge *bridge,
 				  struct drm_bridge_state *old_bridge_state)
 {
-	struct lt9611 *lt9611 = bridge_to_lt9611(bridge);
-
-	lt9611_sleep_setup(lt9611);
 }
 
 static const struct drm_edid *lt9611_bridge_edid_read(struct drm_bridge *bridge,
