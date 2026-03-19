@@ -422,7 +422,7 @@ static void lt9611_enable_hpd_interrupts(struct lt9611 *lt9611)
 	regmap_write(lt9611->regmap, 0x8207, 0x3f);
 }
 
-static void lt9611_sleep_setup(struct lt9611 *lt9611)
+static void __maybe_unused lt9611_sleep_setup(struct lt9611 *lt9611)
 {
 	const struct reg_sequence sleep_setup[] = {
 		{ 0x8024, 0x76 },
@@ -1080,7 +1080,7 @@ static int lt9611_probe(struct i2c_client *client)
 	lt9611->bridge.funcs = &lt9611_bridge_funcs;
 	lt9611->bridge.of_node = client->dev.of_node;
 	lt9611->bridge.ops = DRM_BRIDGE_OP_DETECT | DRM_BRIDGE_OP_EDID |
-			     DRM_BRIDGE_OP_MODES;
+			     DRM_BRIDGE_OP_HPD | DRM_BRIDGE_OP_MODES;
 	lt9611->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
 
 	drm_bridge_add(&lt9611->bridge);
