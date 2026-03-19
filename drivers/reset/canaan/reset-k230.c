@@ -337,7 +337,7 @@ static int k230_reset_probe(struct platform_device *pdev)
     struct k230_reset_controller *rstc;
     struct resource *res;
 
-    rstc = devm_kmalloc(&pdev->dev, sizeof(*rstc), GFP_KERNEL);
+    rstc = devm_kzalloc(&pdev->dev, sizeof(*rstc), GFP_KERNEL);
     if (!rstc) {
         pr_err("k230_reset_init dev_kmalloc error!");
         return -1;
@@ -364,7 +364,7 @@ static int k230_reset_probe(struct platform_device *pdev)
         pr_info("[K230_RESET]:k230_reset_probe ok!");
     #endif
     } else {
-        pr_info("[K230_RESET]:k230_reset_probe error!");
+        pr_err("[K230_RESET]:k230_reset_probe error!");
     }
     return 0;
 }
