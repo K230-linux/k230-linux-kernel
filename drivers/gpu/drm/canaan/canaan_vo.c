@@ -179,9 +179,12 @@ static void canaan_vo_update_osd(struct canaan_vo *vo,
 
 	switch (fb->format->format) {
 	case DRM_FORMAT_ARGB8888:
-	case DRM_FORMAT_XRGB8888:
 		reg_val = 0x53;
-		rb_swap = 0x0F;
+		rb_swap = 0x4F;
+		break;
+	case DRM_FORMAT_XRGB8888:
+		reg_val = 0x03;
+		rb_swap = 0x4F;
 		break;
 	case DRM_FORMAT_ARGB4444:
 		reg_val = 0x54;
@@ -523,7 +526,7 @@ static const uint32_t video_plane_formats[] = {
 };
 
 static const uint32_t osd_plane_formats[] = {
-	DRM_FORMAT_ARGB8888, DRM_FORMAT_XRGB8888, DRM_FORMAT_ARGB4444,
+	DRM_FORMAT_XRGB8888, DRM_FORMAT_ARGB8888, DRM_FORMAT_ARGB4444,
 	DRM_FORMAT_ARGB1555, DRM_FORMAT_RGB888,   DRM_FORMAT_RGB565,
 	DRM_FORMAT_BGR888
 };
