@@ -7,6 +7,8 @@
 /dts-v1/;
 
 #include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/soc/canaan,k230_pm_domains.h>
+#include <dt-bindings/reset/canaan-k230-reset.h>
 
 / {
 	model = "Canaan Kendryte K230";
@@ -519,6 +521,7 @@
 		display: display-subsystem {
 			compatible = "canaan,display-subsystem";
 			ports = <&vo_out>;
+			power-domains = <&sysctl_power K230_PM_DOMAIN_DISP>;
 			status = "okay";
 		};
 
@@ -532,14 +535,26 @@
 
 		vo: vo@90840000 {
 			compatible = "canaan,k230-vo";
-			reg = <0x0 0x90840000 0x0 0x10000 >;
+			reg = <0x0 0x90840000 0x0 0x10000>;
 			interrupt-parent = <&plic>;
 			interrupts = <133 IRQ_TYPE_LEVEL_HIGH>;
+			resets = <&sysctl_reset
+				K230_RESET_DISP_REG_OFFSET
+				K230_RESET_DISP_TYPE
+				K230_RESET_DISP_DONE_BIT
+				K230_RESET_DISP_ASSERT_BIT>;
 			status = "okay";
+
+			background = <0xffffff>;
+			vth_line = <10>;
 
 			vo_out: port {
 				#address-cells = <1>;
 				#size-cells = <0>;
+				vop_out_dsi: endpoint@0 {
+					reg = <0>;
+					remote-endpoint = <&dsi_in_vop>;
+				};
 			};
 		};
 
@@ -550,27 +565,17 @@
 			#size-cells = <0>;
 			status = "okay";
 
-			panel@0 {
-				compatible = "canaan,hx8399";
-				reg = <0>;
-				panel-width-mm = <68>;
-				panel-height-mm = <120>;
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
 
-				display-timings {
-					timing-0 {
-						clock-frequency = <74437200>;
-						hactive = <1080>;
-						vactive = <1920>;
-						hfront-porch = <40>;
-						hback-porch = <20>;
-						hsync-len = <20>;
-						vfront-porch = <206>;
-						vback-porch = <8>;
-						vsync-len = <5>;
+				port@0 {
+					reg = <0>;
+					dsi_in_vop: endpoint {
+						remote-endpoint = <&vop_out_dsi>;
 					};
 				};
 			};
 		};
-
 	};
 };
