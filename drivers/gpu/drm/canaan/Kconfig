@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-2.0-only
+config DRM_CANAAN
+	tristate "DRM Support for Canaan K230 Display Controller"
+	depends on OF
+	depends on COMMON_CLK
+	depends on DRM
+	select DRM_KMS_HELPER
+	select DRM_GEM_DMA_HELPER
+	select DRM_MIPI_DSI
+	select DRM_DW_MIPI_DSI
+	select DRM_DISPLAY_HELPER
+	select DRM_BRIDGE_CONNECTOR
+	select VIDEOMODE_HELPERS
+	default ARCH_CANAAN
+	help
+	  Choose this option if you have a Canaan K230 soc chipset.
+	  This driver provides kernel mode setting and buffer
+	  management to userspace. This driver does not provide
+	  2D or 3D acceleration; acceleration is performed by other
+	  IP found on the SoC.
+
+	  It includes the MIPI-DSI host, built on top of the generic
+	  Synopsys DesignWare MIPI DSI bridge library, which can drive
+	  a DSI panel or an external bridge such as the Lontium LT9611.
