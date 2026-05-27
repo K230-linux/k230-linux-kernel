@@ -5861,6 +5861,17 @@ F:	Documentation/devicetree/bindings/mfd/canaan,k210-sysctl.yaml
 F:	drivers/soc/canaan/
 F:	include/soc/canaan/
 
+CANAAN/KENDRYTE K230 DISPLAY CONTROLLER DRIVER
+M:	Sungjoon Moon <sumoon@seoulsaram.org>
+L:	dri-devel@lists.freedesktop.org
+L:	linux-riscv@lists.infradead.org
+S:	Maintained
+T:	git git://anongit.freedesktop.org/drm/drm-misc
+F:	Documentation/devicetree/bindings/display/canaan,display-subsystem.yaml
+F:	Documentation/devicetree/bindings/display/canaan,k230-mipi-dsi.yaml
+F:	Documentation/devicetree/bindings/display/canaan,k230-vo.yaml
+F:	drivers/gpu/drm/canaan/
+
 CAPABILITIES
 M:	Serge Hallyn <serge@hallyn.com>
 L:	linux-security-module@vger.kernel.org
