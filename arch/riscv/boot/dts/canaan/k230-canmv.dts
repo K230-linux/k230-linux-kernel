@@ -3,6 +3,8 @@
  * Copyright (C) 2024 Yangyu Chen <cyy@cyyself.name>
  */
 
+#include <dt-bindings/gpio/gpio.h>
+
 #include "k230.dtsi"
 
 / {
@@ -26,6 +28,34 @@
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <50000000>;
+	};
+
+	hdmi_connector: connector {
+		compatible = "hdmi-connector";
+		label = "hdmi";
+		type = "a";
+
+		port {
+			hdmi_connector_in: endpoint {
+				remote-endpoint = <&lt9611_out>;
+			};
+		};
+	};
+
+	lt9611_1v8: regulator-lt9611-1v8 {
+		compatible = "regulator-fixed";
+		regulator-name = "lt9611-vdd-1v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+	};
+
+	lt9611_3v3: regulator-lt9611-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "lt9611-vcc-3v3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
 	};
 };
 
@@ -340,4 +370,58 @@
 &sysclk {
 	clocks = <&osc24m>, <&timerx_pulse_in>;
 	clock-names = "osc24m", "timer-pulse-in";
+};
+
+/* GPIO bank B (GPIO 32-63) provides the LT9611 reset and interrupt lines. */
+&gpio1 {
+	status = "okay";
+};
+
+&i2c4 {
+	pinctrl-0 = <&iic4_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	hdmi-bridge@3b {
+		compatible = "lontium,lt9611";
+		reg = <0x3b>;
+		/* GPIO 42 (bank B offset 10), active high reset */
+		reset-gpios = <&portb 10 GPIO_ACTIVE_HIGH>;
+		/* GPIO 43 (bank B offset 11), falling-edge interrupt */
+		interrupt-parent = <&portb>;
+		interrupts = <11 IRQ_TYPE_EDGE_FALLING>;
+		vdd-supply = <&lt9611_1v8>;
+		vcc-supply = <&lt9611_3v3>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				lt9611_in: endpoint {
+					remote-endpoint = <&dsi_out>;
+				};
+			};
+
+			port@2 {
+				reg = <2>;
+				lt9611_out: endpoint {
+					remote-endpoint = <&hdmi_connector_in>;
+				};
+			};
+		};
+	};
+};
+
+&vo {
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+};
+
+&dsi_out {
+	remote-endpoint = <&lt9611_in>;
 };
