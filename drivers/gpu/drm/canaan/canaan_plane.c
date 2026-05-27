@@ -19,7 +19,7 @@
 #include "canaan_plane.h"
 
 static int canaan_plane_atomic_check(struct drm_plane *plane,
-				     struct drm_atomic_state *state)
+				     struct drm_atomic_commit *state)
 {
 	struct drm_plane_state *plane_state =
 		drm_atomic_get_new_plane_state(state, plane);
@@ -42,7 +42,7 @@ static int canaan_plane_atomic_check(struct drm_plane *plane,
 }
 
 static void canaan_plane_atomic_update(struct drm_plane *plane,
-				       struct drm_atomic_state *state)
+				       struct drm_atomic_commit *state)
 {
 	struct drm_plane_state *plane_state =
 		drm_atomic_get_new_plane_state(state, plane);
@@ -59,7 +59,7 @@ static void canaan_plane_atomic_update(struct drm_plane *plane,
 }
 
 static void canaan_plane_atomic_disable(struct drm_plane *plane,
-					struct drm_atomic_state *state)
+					struct drm_atomic_commit *state)
 {
 	struct canaan_plane *canaan_plane = to_canaan_plane(plane);
 	struct canaan_vo *vo = canaan_plane->vo;

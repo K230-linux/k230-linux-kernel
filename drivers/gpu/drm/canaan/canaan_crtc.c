@@ -39,7 +39,7 @@ static void canaan_crtc_disable_vblank(struct drm_crtc *crtc)
 }
 
 static void canaan_crtc_atomic_enable(struct drm_crtc *crtc,
-				      struct drm_atomic_state *old_crtc_state)
+				      struct drm_atomic_commit *old_crtc_state)
 {
 	struct canaan_crtc *canaan_crtc = to_canaan_crtc(crtc);
 	struct canaan_vo *vo = canaan_crtc->vo;
@@ -52,7 +52,7 @@ static void canaan_crtc_atomic_enable(struct drm_crtc *crtc,
 }
 
 static void canaan_crtc_atomic_disable(struct drm_crtc *crtc,
-				       struct drm_atomic_state *old_crtc_state)
+				       struct drm_atomic_commit *old_crtc_state)
 {
 	struct canaan_crtc *canaan_crtc = to_canaan_crtc(crtc);
 	struct canaan_vo *vo = canaan_crtc->vo;
@@ -72,7 +72,7 @@ static void canaan_crtc_atomic_disable(struct drm_crtc *crtc,
 }
 
 static void canaan_crtc_atomic_flush(struct drm_crtc *crtc,
-				     struct drm_atomic_state *old_crtc_state)
+				     struct drm_atomic_commit *old_crtc_state)
 {
 	struct canaan_crtc *canaan_crtc = to_canaan_crtc(crtc);
 	struct canaan_vo *vo = canaan_crtc->vo;
