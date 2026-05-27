@@ -73,6 +73,49 @@
 		dma-noncoherent;
 		ranges;
 
+		vo: vo@90840000 {
+			compatible = "canaan,k230-vo";
+			reg = <0x0 0x90840000 0x0 0x10000>;
+			interrupts = <133 IRQ_TYPE_LEVEL_HIGH>;
+			resets = <&rst RST_DISP>;
+			status = "disabled";
+
+			port {
+				vo_out: endpoint {
+					remote-endpoint = <&dsi_in>;
+				};
+			};
+		};
+
+		dsi: dsi@90850000 {
+			compatible = "canaan,k230-mipi-dsi";
+			reg = <0x0 0x90850000 0x0 0x1000>;
+			clocks = <&sysclk K230_DISPLAY_CFG_RATE>,
+				 <&sysclk K230_DISPLAY_DPIP_RATE>;
+			clock-names = "pclk", "pixel";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				port@0 {
+					reg = <0>;
+					dsi_in: endpoint {
+						remote-endpoint = <&vo_out>;
+					};
+				};
+
+				port@1 {
+					reg = <1>;
+					dsi_out: endpoint {
+					};
+				};
+			};
+		};
+
 		plic: interrupt-controller@f00000000 {
 			compatible = "canaan,k230-plic", "thead,c900-plic";
 			reg = <0xf 0x00000000 0x0 0x04000000>;
@@ -282,5 +325,10 @@
 					     <95 IRQ_TYPE_LEVEL_HIGH>;
 			};
 		};
+	};
+
+	display-subsystem {
+		compatible = "canaan,display-subsystem";
+		ports = <&vo_out>;
 	};
 };
