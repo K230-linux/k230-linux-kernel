@@ -163,5 +163,16 @@
 			resets = <&rst RST_UART4>;
 			status = "disabled";
 		};
+
+		i2c4: i2c@91409000 {
+			compatible = "snps,designware-i2c";
+			reg = <0x0 0x91409000 0x0 0x1000>;
+			interrupts = <25 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&sysclk K230_LS_I2C4_RATE>;
+			clock-frequency = <400000>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+		};
 	};
 };
