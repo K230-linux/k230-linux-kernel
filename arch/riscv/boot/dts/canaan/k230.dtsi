@@ -174,5 +174,113 @@
 			#size-cells = <0>;
 			status = "disabled";
 		};
+
+		gpio0: gpio@9140b000 {
+			compatible = "snps,dw-apb-gpio";
+			reg = <0x0 0x9140b000 0x0 0x1000>;
+			clocks = <&sysclk K230_LS_GPIO_APB_GATE>,
+				 <&sysclk K230_LS_GPIO_DEBOUNCE_RATE>;
+			clock-names = "bus", "db";
+			resets = <&rst RST_GPIO_APB>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+
+			porta: gpio-port@0 {
+				compatible = "snps,dw-apb-gpio-port";
+				reg = <0>;
+				gpio-controller;
+				#gpio-cells = <2>;
+				ngpios = <32>;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				interrupts = <32 IRQ_TYPE_LEVEL_HIGH>,
+					     <33 IRQ_TYPE_LEVEL_HIGH>,
+					     <34 IRQ_TYPE_LEVEL_HIGH>,
+					     <35 IRQ_TYPE_LEVEL_HIGH>,
+					     <36 IRQ_TYPE_LEVEL_HIGH>,
+					     <37 IRQ_TYPE_LEVEL_HIGH>,
+					     <38 IRQ_TYPE_LEVEL_HIGH>,
+					     <39 IRQ_TYPE_LEVEL_HIGH>,
+					     <40 IRQ_TYPE_LEVEL_HIGH>,
+					     <41 IRQ_TYPE_LEVEL_HIGH>,
+					     <42 IRQ_TYPE_LEVEL_HIGH>,
+					     <43 IRQ_TYPE_LEVEL_HIGH>,
+					     <44 IRQ_TYPE_LEVEL_HIGH>,
+					     <45 IRQ_TYPE_LEVEL_HIGH>,
+					     <46 IRQ_TYPE_LEVEL_HIGH>,
+					     <47 IRQ_TYPE_LEVEL_HIGH>,
+					     <48 IRQ_TYPE_LEVEL_HIGH>,
+					     <49 IRQ_TYPE_LEVEL_HIGH>,
+					     <50 IRQ_TYPE_LEVEL_HIGH>,
+					     <51 IRQ_TYPE_LEVEL_HIGH>,
+					     <52 IRQ_TYPE_LEVEL_HIGH>,
+					     <53 IRQ_TYPE_LEVEL_HIGH>,
+					     <54 IRQ_TYPE_LEVEL_HIGH>,
+					     <55 IRQ_TYPE_LEVEL_HIGH>,
+					     <56 IRQ_TYPE_LEVEL_HIGH>,
+					     <57 IRQ_TYPE_LEVEL_HIGH>,
+					     <58 IRQ_TYPE_LEVEL_HIGH>,
+					     <59 IRQ_TYPE_LEVEL_HIGH>,
+					     <60 IRQ_TYPE_LEVEL_HIGH>,
+					     <61 IRQ_TYPE_LEVEL_HIGH>,
+					     <62 IRQ_TYPE_LEVEL_HIGH>,
+					     <63 IRQ_TYPE_LEVEL_HIGH>;
+			};
+		};
+
+		gpio1: gpio@9140c000 {
+			compatible = "snps,dw-apb-gpio";
+			reg = <0x0 0x9140c000 0x0 0x1000>;
+			clocks = <&sysclk K230_LS_GPIO_APB_GATE>,
+				 <&sysclk K230_LS_GPIO_DEBOUNCE_RATE>;
+			clock-names = "bus", "db";
+			resets = <&rst RST_GPIO_APB>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+
+			portb: gpio-port@0 {
+				compatible = "snps,dw-apb-gpio-port";
+				reg = <0>;
+				gpio-controller;
+				#gpio-cells = <2>;
+				ngpios = <32>;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				interrupts = <64 IRQ_TYPE_LEVEL_HIGH>,
+					     <65 IRQ_TYPE_LEVEL_HIGH>,
+					     <66 IRQ_TYPE_LEVEL_HIGH>,
+					     <67 IRQ_TYPE_LEVEL_HIGH>,
+					     <68 IRQ_TYPE_LEVEL_HIGH>,
+					     <69 IRQ_TYPE_LEVEL_HIGH>,
+					     <70 IRQ_TYPE_LEVEL_HIGH>,
+					     <71 IRQ_TYPE_LEVEL_HIGH>,
+					     <72 IRQ_TYPE_LEVEL_HIGH>,
+					     <73 IRQ_TYPE_LEVEL_HIGH>,
+					     <74 IRQ_TYPE_LEVEL_HIGH>,
+					     <75 IRQ_TYPE_LEVEL_HIGH>,
+					     <76 IRQ_TYPE_LEVEL_HIGH>,
+					     <77 IRQ_TYPE_LEVEL_HIGH>,
+					     <78 IRQ_TYPE_LEVEL_HIGH>,
+					     <79 IRQ_TYPE_LEVEL_HIGH>,
+					     <80 IRQ_TYPE_LEVEL_HIGH>,
+					     <81 IRQ_TYPE_LEVEL_HIGH>,
+					     <82 IRQ_TYPE_LEVEL_HIGH>,
+					     <83 IRQ_TYPE_LEVEL_HIGH>,
+					     <84 IRQ_TYPE_LEVEL_HIGH>,
+					     <85 IRQ_TYPE_LEVEL_HIGH>,
+					     <86 IRQ_TYPE_LEVEL_HIGH>,
+					     <87 IRQ_TYPE_LEVEL_HIGH>,
+					     <88 IRQ_TYPE_LEVEL_HIGH>,
+					     <89 IRQ_TYPE_LEVEL_HIGH>,
+					     <90 IRQ_TYPE_LEVEL_HIGH>,
+					     <91 IRQ_TYPE_LEVEL_HIGH>,
+					     <92 IRQ_TYPE_LEVEL_HIGH>,
+					     <93 IRQ_TYPE_LEVEL_HIGH>,
+					     <94 IRQ_TYPE_LEVEL_HIGH>,
+					     <95 IRQ_TYPE_LEVEL_HIGH>;
+			};
+		};
 	};
 };
