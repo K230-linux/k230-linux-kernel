@@ -1,0 +1,60 @@
+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/display/canaan,k230-vo.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Canaan K230 Video Output Controller
+
+maintainers:
+  - Sungjoon Moon <sumoon@seoulsaram.org>
+
+description:
+  The Canaan K230 Video Output (VO) controller is the display controller
+  found in the K230 SoC. It supports multiple overlay planes (video layers
+  and OSD layers) and drives a MIPI-DSI output.
+
+properties:
+  compatible:
+    const: canaan,k230-vo
+
+  reg:
+    maxItems: 1
+
+  interrupts:
+    maxItems: 1
+
+  resets:
+    maxItems: 1
+
+  port:
+    $ref: /schemas/graph.yaml#/properties/port
+    unevaluatedProperties: false
+    description:
+      Output port connecting to the MIPI-DSI controller.
+
+required:
+  - compatible
+  - reg
+  - interrupts
+  - port
+
+additionalProperties: false
+
+examples:
+  - |
+    #include <dt-bindings/interrupt-controller/irq.h>
+
+    vo: vo@90840000 {
+        compatible = "canaan,k230-vo";
+        reg = <0x90840000 0x10000>;
+        interrupts = <133 IRQ_TYPE_LEVEL_HIGH>;
+
+        port {
+            vo_out: endpoint {
+                remote-endpoint = <&dsi_in>;
+            };
+        };
+    };
+
+...
